@@ -1,0 +1,164 @@
+<!-- @dsCard group="Nomi App" viewport="440x800" name="Mobile app — interactive" subtitle="Personal/Business finance app: onboarding, dashboard, insights, activity, settings" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nomi — Mobile App</title>
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--surface-page); font-family: var(--font-sans);
+    display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
+  .device { width: 390px; height: 780px; background: var(--neutral-950); border-radius: 46px;
+    padding: 11px; box-shadow: var(--shadow-xl); }
+  .device-screen { position: relative; width: 100%; height: 100%; background: var(--surface-page);
+    border-radius: 36px; overflow: hidden; display: flex; flex-direction: column; }
+  .statusbar { display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 26px 2px; font-size: 13px; font-weight: 500; color: var(--text-strong); flex-shrink: 0; }
+  .statusbar .dots { display: flex; gap: 5px; align-items: center; }
+  .appbody { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 26px;
+    background: var(--neutral-950); border-radius: 0 0 16px 16px; z-index: 50; }
+  .reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { transition: none !important; animation: none !important; }
+  .device.dark {
+    --surface-page: var(--neutral-950);
+    --surface-card: var(--neutral-900);
+    --surface-sunken: var(--neutral-800);
+    --surface-brand-soft: color-mix(in srgb, var(--indigo-800) 55%, var(--neutral-900));
+    --surface-inverse: var(--indigo-950);
+    --text-strong: var(--white);
+    --text-body: var(--neutral-200);
+    --text-muted: var(--neutral-400);
+    --text-subtle: var(--neutral-500);
+    --border-subtle: var(--neutral-800);
+    --border-default: var(--neutral-700);
+  }
+  .device.dark input { background: var(--neutral-800) !important; color: var(--white) !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script src="./data.js"></script>
+<script src="./i18n.js"></script>
+<script type="text/babel" src="./screens.jsx"></script>
+<script type="text/babel">
+  const NS = window.NomiDesignSystem_3ea5bf;
+  const { TabBar, Toast } = NS;
+
+  function App() {
+    const SETTINGS_KEY = 'nomi:settings';
+    const SESSION_KEY = 'nomi:session';
+    const ACCOUNTS_KEY = 'nomi:accounts';
+    const DEFAULTS = { hideBalances: false, weekly: true, realtime: true, biometric: false, reducedMotion: false, darkMode: false, language: 'en', premium: false };
+    const session0 = (() => { try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; } })();
+    const [started, setStarted] = React.useState(!!(session0 && session0.started));
+    const [phase, setPhase] = React.useState(session0 && session0.started ? 'app' : 'intro'); // 'intro' -> 'mode' -> 'auth' -> app
+    const [authView, setAuthView] = React.useState('register'); // 'register' | 'signin'
+    const [mode, setMode] = React.useState((session0 && session0.mode) || 'personal');
+    const [user, setUser] = React.useState((session0 && session0.user) || null);
+    const [tab, setTab] = React.useState('home');
+    const [toast, setToast] = React.useState(null);
+    const [addOpen, setAddOpen] = React.useState(false);
+    const [openTxn, setOpenTxn] = React.useState(null);
+    const [actionInsight, setActionInsight] = React.useState(null);
+    const [customTxns, setCustomTxns] = React.useState({ personal: [], business: [] });
+    const [settings, setSettings] = React.useState(() => {
+      try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}') }; } catch (e) { return { ...DEFAULTS }; }
+    });
+    React.useEffect(() => { try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings)); } catch (e) {} }, [settings]);
+    React.useEffect(() => { try { localStorage.setItem(SESSION_KEY, JSON.stringify({ user, mode, started })); } catch (e) {} }, [user, mode, started]);
+    const setSetting = (k, v) => setSettings((s) => ({ ...s, [k]: v }));
+    const getAccounts = () => { try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY) || '[]'); } catch (e) { return []; } };
+    const saveAccount = (acc) => { const list = getAccounts().filter((a) => a.email.toLowerCase() !== acc.email.toLowerCase()); list.push(acc); try { localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(list)); } catch (e) {} };
+    const findAccount = (email) => getAccounts().find((a) => a.email.toLowerCase() === (email || '').trim().toLowerCase());
+    const { HomeScreen, InsightsScreen, ActivityScreen, SettingsScreen, OnboardingScreen, RegisterScreen, SignInScreen, IntroScreens, AddTransactionSheet, TransactionDetailSheet, InsightActionSheet } = window.NomiScreens;
+
+    const lang0 = settings.language || 'en';
+    const baseData = mode === 'business' ? window.NomiData.BUSINESS : window.NomiData.PERSONAL;
+    const displayName = user ? [user.firstName, user.lastName].filter(Boolean).join(' ').trim() : '';
+    const rawData = { ...baseData, name: displayName || baseData.name, transactions: [...(customTxns[mode] || []), ...baseData.transactions] };
+    const data = window.NomiData.localize(lang0, rawData);
+
+    const showToast = (msg) => { setToast(msg); clearTimeout(window.__nt); window.__nt = setTimeout(() => setToast(null), 2600); };
+
+    function onDone(choice) { setMode(choice); setPhase('auth'); }
+    function onRegistered(form) {
+      const acc = { firstName: form.firstName.trim(), lastName: form.lastName.trim(), email: form.email.trim(), password: form.password, phone: form.phone };
+      saveAccount(acc);
+      setUser(acc);
+      setStarted(true);
+      setTab('home');
+    }
+    function onSignedIn(acc) { setUser(acc); setStarted(true); setTab('home'); }
+    function onUpdateProfile(form) {
+      const updated = { ...user, firstName: form.firstName.trim(), lastName: form.lastName.trim(), email: form.email.trim(), phone: form.phone, photo: form.photo };
+      if (form.newPassword) updated.password = form.newPassword;
+      setUser(updated);
+      saveAccount(updated);
+    }
+    function onSignOut() { setStarted(false); setUser(null); setAuthView('signin'); setPhase('auth'); setTab('home'); showToast(NomiI18n.t(settings.language || 'en', 'toast_signed_out')); }
+    function addTransaction(txn) {
+      setCustomTxns((c) => ({ ...c, [mode]: [txn, ...(c[mode] || [])] }));
+      setAddOpen(false);
+      showToast(NomiI18n.t(settings.language || 'en', 'toast_txn_added'));
+    }
+
+    let screen;
+    const lang = settings.language || 'en';
+    if (tab === 'home') screen = <HomeScreen data={data} mode={mode} onMode={setMode} hideBalances={settings.hideBalances} onToggleHide={() => { setSetting('hideBalances', !settings.hideBalances); }} onProfile={() => setTab('settings')} onSeeAllInsights={() => setTab('insights')} onSeeAllActivity={() => setTab('activity')} onTxnClick={setOpenTxn} onInsightAction={setActionInsight} lang={lang} />;
+    else if (tab === 'insights') screen = <InsightsScreen data={data} mode={mode} onInsightAction={setActionInsight} lang={lang} />;
+    else if (tab === 'activity') screen = <ActivityScreen data={data} mode={mode} onTxnClick={setOpenTxn} lang={lang} />;
+    else screen = <SettingsScreen data={data} mode={mode} onMode={setMode} settings={settings} setSetting={setSetting} showToast={showToast} onSignOut={onSignOut} user={user} onUpdateProfile={onUpdateProfile} lang={lang} />;
+
+    return (
+      <div className={'device' + (settings.reducedMotion ? ' reduce-motion' : '') + (settings.darkMode ? ' dark' : '')}>
+        <div className="device-screen">
+          <div className="notch"></div>
+          <div className="statusbar">
+            <span>9:41</span>
+            <span className="dots"><span>􀙇</span> Nomi <span></span></span>
+            <span style={{fontVariantNumeric:'tabular-nums'}}>100%</span>
+          </div>
+          <div className="appbody">
+            {!started ? (
+              phase === 'intro'
+                ? <IntroScreens onDone={() => setPhase('mode')} lang={settings.language || 'en'} />
+                : phase === 'mode'
+                ? <OnboardingScreen onDone={onDone} lang={settings.language || 'en'} />
+                : authView === 'signin'
+                ? <SignInScreen onDone={onSignedIn} onSwitchToRegister={() => setAuthView('register')} findAccount={findAccount} lang={settings.language || 'en'} />
+                : <RegisterScreen onDone={onRegistered} onSwitchToSignIn={() => setAuthView('signin')} lang={settings.language || 'en'} />
+            ) : (
+              <>
+                <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>{screen}</div>
+                <TabBar active={tab} onChange={setTab}
+                  centerAction={NomiI18n.t(lang, 'add_transaction')} onCenterAction={() => setAddOpen(true)}
+                  items={[
+                    { value: 'home', label: NomiI18n.t(lang, 'tab_home'), icon: 'home' },
+                    { value: 'insights', label: NomiI18n.t(lang, 'tab_insights'), icon: 'sparkles' },
+                    { value: 'activity', label: NomiI18n.t(lang, 'tab_activity'), icon: 'chart' },
+                    { value: 'settings', label: NomiI18n.t(lang, 'tab_settings'), icon: 'settings' },
+                  ]} />
+                <AddTransactionSheet open={addOpen} onClose={() => setAddOpen(false)} onAdd={addTransaction} lang={lang} />
+                <TransactionDetailSheet open={!!openTxn} txn={openTxn} mode={mode} onClose={() => setOpenTxn(null)} lang={lang} />
+                <InsightActionSheet open={!!actionInsight} insight={actionInsight} mode={mode} onClose={() => setActionInsight(null)} showToast={showToast} lang={lang} />
+              </>
+            )}
+          </div>
+          {toast && (
+            <div style={{ position: 'absolute', bottom: 92, left: 0, right: 0, display: 'flex', justifyContent: 'center', zIndex: 60 }}>
+              <Toast>{toast}</Toast>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

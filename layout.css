@@ -1,0 +1,123 @@
+/* Nomi — Color tokens
+   Brand: deep indigo (#26215C, from the logo) + a single green accent (#1D9E75).
+   Restraint pillar: one accent color. Everything else is calm neutrals. */
+
+:root {
+  /* ---- Brand: Indigo (primary) ---- */
+  --indigo-950: #16123A;
+  --indigo-900: #1B1745;
+  --indigo-800: #26215C; /* base — the logo navy */
+  --indigo-700: #332C74;
+  --indigo-600: #423A93;
+  --indigo-500: #5850B0;
+  --indigo-400: #7C74C7;
+  --indigo-300: #ABA6DD;
+  --indigo-200: #D2CFEE;
+  --indigo-100: #E9E7F6;
+  --indigo-50:  #F4F3FB;
+
+  /* ---- Business mode: Indigo-violet (personal=green energy, business=focused violet) ---- */
+  --purple-800: #322A7A;
+  --purple-700: #3F369A;
+  --purple-600: #493FA8;
+  --purple-500: #534AB7; /* base — business-mode accent */
+  --purple-400: #7B73CE;
+  --purple-100: #E7E5F7;
+  --purple-50:  #F3F2FC;
+
+  /* ---- Insight teal (the InsightChip / AI-insight accent) ---- */
+  --teal-800: #0F5C57; /* chip text */
+  --teal-600: #16948A;
+  --teal-100: #D6EDEA;
+  --teal-50:  #EAF6F4; /* chip fill */
+
+  /* ---- Accent: Green (single accent) ---- */
+  --green-800: #0E5540;
+  --green-700: #126B4F;
+  --green-600: #178A66;
+  --green-500: #1D9E75; /* base — the logo dot */
+  --green-400: #35B98D;
+  --green-300: #6FD0AC;
+  --green-200: #A9E3CE;
+  --green-100: #DAF3E9;
+  --green-50:  #EDF9F3;
+
+  /* ---- Neutrals (cool-calm gray) ---- */
+  --neutral-950: #14151A;
+  --neutral-900: #1D1F26;
+  --neutral-800: #2C2F38;
+  --neutral-700: #434752;
+  --neutral-600: #5C616E;
+  --neutral-500: #787E8C;
+  --neutral-400: #9BA0AD;
+  --neutral-300: #C3C7D0;
+  --neutral-200: #E1E3E9;
+  --neutral-100: #EEEFF3;
+  --neutral-50:  #F7F8FA;
+  --white:       #FFFFFF;
+
+  /* ---- Semantic status ---- */
+  --positive-600: #178A66; /* money in / gains — reuses green */
+  --positive-500: #1D9E75;
+  --positive-100: #DAF3E9;
+  --warning-600:  #C08206;
+  --warning-500:  #E0A008;
+  --warning-100:  #FBEECB;
+  --negative-600: #B8481F; /* money out / risk — coral, calmer than red */
+  --negative-500: #D85A30; /* coral alert */
+  --negative-100: #FBE7DD;
+  --info-500:     #5850B0;
+  --info-100:     #E9E7F6;
+
+  /* =========================================================
+     Semantic aliases — reach for these in components
+     ========================================================= */
+
+  /* Text */
+  --text-strong:   var(--indigo-900);   /* headings, key figures */
+  --text-body:     var(--neutral-800);  /* default body */
+  --text-muted:    var(--neutral-600);  /* secondary / captions */
+  --text-subtle:   var(--neutral-500);  /* labels, meta */
+  --text-on-dark:  var(--white);
+  --text-on-accent:var(--white);
+  --text-link:     var(--indigo-600);
+  --text-link-hover: var(--indigo-700);
+
+  /* Surfaces */
+  --surface-page:     var(--neutral-50);
+  --surface-card:     var(--white);
+  --surface-sunken:   var(--neutral-100);
+  --surface-inverse:  var(--indigo-800);
+  --surface-inverse-2:var(--indigo-900);
+  --surface-accent-soft: var(--green-50);
+  --surface-brand-soft:  var(--indigo-50);
+
+  /* Borders */
+  --border-subtle: var(--neutral-200);
+  --border-default:var(--neutral-300);
+  --border-strong: var(--neutral-400);
+  --border-focus:  var(--indigo-500);
+
+  /* Interactive — brand primary */
+  --action-primary:        var(--indigo-800);
+  --action-primary-hover:  var(--indigo-700);
+  --action-primary-active: var(--indigo-900);
+
+  /* Interactive — accent (used sparingly, one CTA) */
+  --action-accent:        var(--green-500);
+  --action-accent-hover:  var(--green-600);
+  --action-accent-active: var(--green-700);
+
+  /* Focus ring */
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--indigo-500) 35%, transparent);
+
+  /* Mode accents — Personal (green) vs Business (violet) */
+  --mode-personal:      var(--green-500);
+  --mode-personal-soft: var(--green-50);
+  --mode-business:      var(--purple-500);
+  --mode-business-soft: var(--purple-50);
+
+  /* Insight chip */
+  --insight-fill: var(--teal-50);
+  --insight-text: var(--teal-800);
+}

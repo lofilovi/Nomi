@@ -1,0 +1,33 @@
+/* Nomi — Webfonts (official brand families, SIL OFL).
+   Sora   → headlines & display (Medium 500 max).
+   Inter  → body, UI, and numbers (Regular 400 / Medium 500).
+   Per the guidelines: never heavier than Medium — bold/heavy read as shouting. */
+
+@font-face {
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Sora-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/Sora-Medium.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/Inter-Regular.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/Inter-Medium.ttf') format('truetype');
+}
